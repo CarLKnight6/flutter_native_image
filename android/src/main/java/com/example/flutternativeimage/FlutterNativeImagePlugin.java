@@ -1,30 +1,40 @@
 package com.example.flutternativeimage;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-import io.flutter.plugin.common.MethodChannel.Result;
 
-public class FlutterNativeImagePlugin implements FlutterPlugin, MethodCallHandler {
+/**
+ * FlutterNativeImagePlugin
+ */
+public class FlutterNativeImagePlugin implements FlutterPlugin {
+  private static final String CHANNEL_NAME = "flutter_native_image";
   private MethodChannel channel;
 
   @Override
-  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_native_image");
-    channel.setMethodCallHandler(this);
+  public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+    setupChannel(binding.getBinaryMessenger(), binding.getApplicationContext());
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    channel.setMethodCallHandler(null);
+    teardownChannel();
   }
 
-  @Override
-  public void onMethodCall(MethodCall call, Result result) {
-    // TODO: Port the actual method logic from the original plugin here
-    result.notImplemented(); // temporary placeholder
+  private void setupChannel(BinaryMessenger messenger, Context context) {
+    channel = new MethodChannel(messenger, CHANNEL_NAME);
+    MethodCallHandlerImpl handler = new MethodCallHandlerImpl(context);
+    channel.setMethodCallHandler(handler);
+  }
+
+  private void teardownChannel() {
+    if (channel != null) {
+      channel.setMethodCallHandler(null);
+      channel = null;
+    }
   }
 }
