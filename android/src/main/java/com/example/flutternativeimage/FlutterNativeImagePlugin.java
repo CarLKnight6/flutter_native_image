@@ -1,44 +1,30 @@
 package com.example.flutternativeimage;
 
-import android.content.Context;
+import androidx.annotation.NonNull;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.MethodChannel.Result;
 
-/**
- * FlutterNativeImagePlugin
- */
-public class FlutterNativeImagePlugin implements FlutterPlugin {
-  private static final String CHANNEL_NAME = "flutter_native_image";
+public class FlutterNativeImagePlugin implements FlutterPlugin, MethodCallHandler {
   private MethodChannel channel;
-  /**
-   * Plugin registration.
-   */
-  public static void registerWith(PluginRegistry.Registrar registrar) {
-    final FlutterNativeImagePlugin plugin = new FlutterNativeImagePlugin();
-    plugin.setupChannel(registrar.messenger(), registrar.context());
+
+  @Override
+  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_native_image");
+    channel.setMethodCallHandler(this);
   }
 
   @Override
-  public void onAttachedToEngine(FlutterPlugin.FlutterPluginBinding binding) {
-    setupChannel(binding.getFlutterEngine().getDartExecutor(), binding.getApplicationContext());
-  }
-
-  @Override
-  public void onDetachedFromEngine(FlutterPlugin.FlutterPluginBinding binding) {
-    teardownChannel();
-  }
-
-  private void setupChannel(BinaryMessenger messenger, Context context) {
-    channel = new MethodChannel(messenger, CHANNEL_NAME);
-    MethodCallHandlerImpl handler = new MethodCallHandlerImpl(context);
-    channel.setMethodCallHandler(handler);
-  }
-
-  private void teardownChannel() {
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
-    channel = null;
+  }
+
+  @Override
+  public void onMethodCall(MethodCall call, Result result) {
+    // TODO: Port the actual method logic from the original plugin here
+    result.notImplemented(); // temporary placeholder
   }
 }
